@@ -4,7 +4,7 @@ def init():
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="MooPassword1"
+        password="Pandi9089@!"
     )
     return mydb
   
@@ -13,7 +13,7 @@ def init_with_db(dbName):
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="MooPassword1",
+        password="Pandi9089@!",
         database=dbName
     )
     return mydb  
